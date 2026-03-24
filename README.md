@@ -2,7 +2,7 @@
 
 This repository provides integrations for agentmfa with various cloud providers and services.
 
-<img src="images/Smartphone%20fingerprint%20with%20neural%20network.png" alt="Smartphone fingerprint with neural network" width="200" style="float: right;">
+<img src="images/agentmfa-logo.png" alt="Smartphone fingerprint with neural network" width="200" style="float: right;">
 
 ## Supported Integrations
 
