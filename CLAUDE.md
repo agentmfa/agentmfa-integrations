@@ -47,9 +47,10 @@ Priority order:
 1. **MCP server** (`mcp/`) — Go binary exposing AgentMFA as MCP tools; works with Claude Code, Cursor, and any MCP-compatible agent
 2. **Claude Code plugin** (repo root) — bundles the skill + MCP config; install with `claude plugin install`
 3. **Go SDK** (`sdk/go/`) — thin library wrapping the request→poll flow for Go agents
-4. **Webhook support** — push approval results to agents instead of requiring polling
-
-Python SDK (LangChain/CrewAI) is backlogged — no concrete users yet.
+**Backlog (no concrete users yet):**
+- **Webhook support** — push approval results to agents; blocked by the fact that most agents are clients, not servers, and don't have a persistent endpoint to receive webhooks
+- **Go SDK** (`sdk/go/`) — direct library integration for Go agents without MCP
+- **Python SDK** — LangChain/CrewAI integration
 
 ---
 
