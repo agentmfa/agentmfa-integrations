@@ -41,6 +41,61 @@ That's it — your agent will now ask for your approval before taking any sensit
 
 ---
 
+## Get started with OpenClaw
+
+### Step 1 — Create an account
+
+Sign up at [agentmfa.ai](https://agentmfa.ai) and grab your API key from the dashboard.
+
+### Step 2 — Add the MCP server
+
+Add this to your `~/.openclaw/openclaw.json`:
+
+```json
+{
+  "mcp": {
+    "servers": {
+      "agentmfa": {
+        "command": "npx",
+        "args": ["-y", "@agentmfa/mcp"]
+      }
+    }
+  }
+}
+```
+
+### Step 3 — Add your API key
+
+```sh
+export AGENTMFA_API_KEY=your_api_key_here
+```
+
+### Step 4 — Install the skill
+
+**Via ClawHub** (recommended):
+
+```sh
+openclaw skills install agentmfa
+```
+
+**Via curl** — global, available to all your OpenClaw agents:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/agentmfa/agentmfa-integrations/main/install-skill.sh | sh
+```
+
+**Via curl** — per workspace, available only in a specific project:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/agentmfa/agentmfa-integrations/main/install-skill.sh | sh -s -- /path/to/your/workspace/skills
+```
+
+### Step 5 — Install the mobile app
+
+Download the AgentMFA app on your phone and sign in with the same account.
+
+---
+
 ## Get started with other AI tools
 
 AgentMFA works with any MCP-compatible agent (Cursor, Windsurf, etc.). Add this to your MCP config file:
@@ -56,7 +111,7 @@ AgentMFA works with any MCP-compatible agent (Cursor, Windsurf, etc.). Add this 
 }
 ```
 
-Make sure `AGENTMFA_API_KEY` is set in your shell environment.
+Make sure `AGENTMFA_API_KEY` is set in your shell environment, then instruct your agent to call `request_approval` before sensitive actions.
 
 ---
 

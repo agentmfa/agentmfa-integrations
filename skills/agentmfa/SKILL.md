@@ -4,7 +4,7 @@ description: Request human approval via biometric auth before performing sensiti
 license: MIT
 metadata:
   author: agentmfa
-  version: "2.0.0"
+  version: "1.0.4"
   abstract: AgentMFA pauses an agent before a sensitive action and requires the human operator to approve it on their phone using biometrics. Uses the AgentMFA MCP server — call request_approval, then wait_for_approval.
 ---
 
