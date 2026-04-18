@@ -1,0 +1,19 @@
+{
+  "name": "@agentmfa/mcp",
+  "version": "1.0.0",
+  "description": "AgentMFA MCP server — human-in-the-loop biometric approval for AI agents",
+  "license": "MIT",
+  "bin": {
+    "agentmfa-mcp": "bin.js"
+  },
+  "files": [
+    "bin.js"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agentmfa/agentmfa-integrations"
+  }
+}

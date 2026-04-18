@@ -1,0 +1,12 @@
+**/claude/settings.local.json
+
+# Go
+mcp/agentmfa-mcp
+mcp/*.exe
+bin/
+*.test
+*.out
+vendor/
+
+# npm wrapper downloaded binaries
+npm/bin/

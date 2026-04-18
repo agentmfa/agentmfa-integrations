@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "agentmfa": {
+      "command": "agentmfa-mcp",
+      "env": {
+        "AGENTMFA_API_KEY": "${AGENTMFA_API_KEY}"
+      }
+    }
+  }
+}
