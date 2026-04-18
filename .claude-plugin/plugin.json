@@ -24,7 +24,7 @@
       "command": "npx",
       "args": ["-y", "@agentmfa/mcp"],
       "env": {
-        "AGENTMFA_API_KEY": "${user_config.api_key}"
+        "AGENTMFA_API_KEY": "${AGENTMFA_API_KEY}"
       }
     }
   }
