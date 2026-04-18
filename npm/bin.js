@@ -58,7 +58,7 @@ async function main() {
   const binaryPath = path.join(__dirname, 'bin', binaryName);
 
   if (!fs.existsSync(binaryPath)) {
-    const url = `https://github.com/agentmfa/agentmfa-integrations/releases/download/v${VERSION}/${binaryName}`;
+    const url = `https://github.com/agentmfa/agentmfa-integrations/releases/download/${VERSION}/${binaryName}`;
     process.stderr.write(`agentmfa-mcp: downloading binary for ${process.platform}-${process.arch}...\n`);
     try {
       await download(url, binaryPath);
