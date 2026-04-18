@@ -13,7 +13,9 @@
   "skills": "./skills/",
   "userConfig": {
     "api_key": {
+      "title": "AgentMFA API Key",
       "description": "Your AgentMFA API key — get it from agentmfa.ai dashboard (format: agentmfa_xxx)",
+      "type": "string",
       "sensitive": true
     }
   },
