@@ -1,6 +1,6 @@
 {
   "name": "@agentmfa/mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AgentMFA MCP server — human-in-the-loop biometric approval for AI agents",
   "license": "MIT",
   "bin": {
