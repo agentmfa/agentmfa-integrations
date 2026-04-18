@@ -8,7 +8,7 @@ AgentMFA adds a human approval step to your AI agent. Before it deletes files, d
 
 ---
 
-## Get started
+## Get started with Claude
 
 ### Step 1 — Create an account
 
@@ -41,16 +41,7 @@ That's it — your agent will now ask for your approval before taking any sensit
 
 ---
 
-## What it looks like
-
-1. You ask Claude to do something that could have consequences (deploy to production, delete data, send an email, etc.)
-2. Claude pauses and sends a notification to your phone
-3. You see what it's about to do and tap Approve or Reject
-4. Claude proceeds — or stops — based on your decision
-
----
-
-## Using with other AI tools
+## Get started with other AI tools
 
 AgentMFA works with any MCP-compatible agent (Cursor, Windsurf, etc.). Add this to your MCP config file:
 
@@ -59,11 +50,20 @@ AgentMFA works with any MCP-compatible agent (Cursor, Windsurf, etc.). Add this 
   "mcpServers": {
     "agentmfa": {
       "command": "npx",
-      "args": ["-y", "@agentmfa/mcp"],
-      "env": {
-        "AGENTMFA_API_KEY": "your_api_key_here"
-      }
+      "args": ["-y", "@agentmfa/mcp"]
     }
   }
 }
 ```
+
+Make sure `AGENTMFA_API_KEY` is set in your shell environment.
+
+---
+
+## What it looks like
+
+1. You ask Claude to do something that could have consequences (deploy to production, delete data, send an email, etc.)
+2. Claude pauses and sends a notification to your phone
+3. You see what it's about to do and tap Approve or Reject
+4. Claude proceeds — or stops — based on your decision
+
