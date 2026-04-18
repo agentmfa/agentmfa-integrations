@@ -61,8 +61,6 @@ jobs:
   npm:
     needs: release
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -71,9 +69,8 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Clear token config so OIDC is used
-        run: sed -i '/:_authToken/d' "${NPM_CONFIG_USERCONFIG}"
-
       - name: Publish to npm
         working-directory: npm
-        run: npm publish --provenance --access public
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
