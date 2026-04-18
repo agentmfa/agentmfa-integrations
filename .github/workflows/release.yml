@@ -72,7 +72,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Clear token config so OIDC is used
-        run: npm config delete //registry.npmjs.org/:_authToken || true
+        run: sed -i '/:_authToken/d' "${NPM_CONFIG_USERCONFIG}"
 
       - name: Publish to npm
         working-directory: npm
