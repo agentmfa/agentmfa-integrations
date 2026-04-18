@@ -1,6 +1,7 @@
 ---
 name: agentmfa
 description: Request human approval via biometric auth before performing sensitive actions. Use this skill whenever an action is irreversible, destructive, or requires human sign-off (e.g. deleting data, deploying to production, sending emails, making payments).
+homepage: https://agentmfa.ai
 license: MIT
 metadata:
   {
