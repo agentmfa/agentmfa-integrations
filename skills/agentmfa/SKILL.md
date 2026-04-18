@@ -33,7 +33,7 @@ The MCP server must be configured in your agent runtime before this skill can be
 
 ## How to Use
 
-This skill uses the AgentMFA MCP server tools. The MCP server handles all API communication — no direct HTTP calls needed in your agent code.
+This skill uses the AgentMFA MCP server tools. The MCP server handles all API communication — your agent code makes only tool calls, no direct HTTP calls. The MCP server requires `AGENTMFA_API_KEY` to be set in your shell environment.
 
 ### Standard flow (blocking)
 
