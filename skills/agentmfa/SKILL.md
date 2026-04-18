@@ -24,7 +24,7 @@ Use this skill before performing any sensitive or irreversible action. The human
 - **MCP server:** Local binary (`@agentmfa/mcp`) that runs on your machine and makes outbound HTTPS calls to `api.agentmfa.ai`
 - **Auth:** Requires `AGENTMFA_API_KEY` set in your shell environment — obtain from the AgentMFA dashboard after signing up
 - **Privacy & security policy:** https://agentmfa.ai/privacy
-- **Source code:** https://github.com/agentmfa/agentmfa-integrations
+- **Source code:** https://github.com/agentmfa/agentmfa-integrations (fully open source — MCP server source is in `mcp/`)
 
 The MCP server must be configured in your agent runtime before this skill can be used. See the setup instructions at https://github.com/agentmfa/agentmfa-integrations.
 
