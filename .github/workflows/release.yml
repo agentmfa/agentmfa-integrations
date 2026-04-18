@@ -70,6 +70,10 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Set version from tag
+        working-directory: npm
+        run: npm version ${{ github.ref_name }} --no-git-tag-version
+
       - name: Publish to npm
         working-directory: npm
         run: npm publish --access public
