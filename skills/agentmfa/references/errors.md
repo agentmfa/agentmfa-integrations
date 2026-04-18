@@ -12,4 +12,4 @@
 
 - Never proceed without `"status": "approved"`
 - Never retry a rejected request automatically — only the human can re-initiate
-- Never reuse a `code` — each approval generates a unique one-time code
+- Never reuse a `code` — each approval generates a unique one-time approval code
