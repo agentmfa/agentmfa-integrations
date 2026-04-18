@@ -11,21 +11,10 @@
   "license": "MIT",
   "keywords": ["security", "approval", "biometric", "human-in-the-loop", "mcp"],
   "skills": "./skills/",
-  "userConfig": {
-    "api_key": {
-      "title": "AgentMFA API Key",
-      "description": "Your AgentMFA API key — get it from agentmfa.ai dashboard (format: agentmfa_xxx)",
-      "type": "string",
-      "sensitive": true
-    }
-  },
   "mcpServers": {
     "agentmfa": {
       "command": "npx",
-      "args": ["-y", "@agentmfa/mcp"],
-      "env": {
-        "AGENTMFA_API_KEY": "${AGENTMFA_API_KEY}"
-      }
+      "args": ["-y", "@agentmfa/mcp"]
     }
   }
 }
