@@ -6,10 +6,13 @@ metadata:
   author: agentmfa
   version: "1.0.4"
   abstract: AgentMFA pauses an agent before a sensitive action and requires the human operator to approve it on their phone using biometrics. Uses the AgentMFA MCP server — call request_approval, then wait_for_approval.
-  env:
-    required:
-      - name: AGENTMFA_API_KEY
-        description: API key for the AgentMFA service — obtained from https://agentmfa.ai after signing up
+  openclaw:
+    requires:
+      bins:
+        - npx
+      env:
+        - name: AGENTMFA_API_KEY
+          description: API key for the AgentMFA service — obtained from https://agentmfa.ai after signing up
 ---
 
 # AgentMFA Skill
