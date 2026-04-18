@@ -3,16 +3,34 @@ name: agentmfa
 description: Request human approval via biometric auth before performing sensitive actions. Use this skill whenever an action is irreversible, destructive, or requires human sign-off (e.g. deleting data, deploying to production, sending emails, making payments).
 license: MIT
 metadata:
-  author: agentmfa
-  version: "1.0.4"
-  abstract: AgentMFA pauses an agent before a sensitive action and requires the human operator to approve it on their phone using biometrics. Uses the AgentMFA MCP server — call request_approval, then wait_for_approval.
-  openclaw:
-    requires:
-      bins:
-        - npx
-      env:
-        - name: AGENTMFA_API_KEY
-          description: API key for the AgentMFA service — obtained from https://agentmfa.ai after signing up
+  {
+    "author": "agentmfa",
+    "version": "1.0.4",
+    "abstract": "AgentMFA pauses an agent before a sensitive action and requires the human operator to approve it on their phone using biometrics. Uses the AgentMFA MCP server — call request_approval, then wait_for_approval.",
+    "openclaw":
+      {
+        "emoji": "🔐",
+        "requires": { "bins": ["npx"] },
+        "install":
+          [
+            {
+              "id": "npm",
+              "kind": "node",
+              "package": "@agentmfa/mcp",
+              "bins": ["agentmfa-mcp"],
+              "label": "Install AgentMFA MCP server (npm)",
+            },
+          ],
+        "env":
+          [
+            {
+              "name": "AGENTMFA_API_KEY",
+              "description": "API key for the AgentMFA service — obtain from https://agentmfa.ai after signing up",
+              "required": true,
+            },
+          ],
+      },
+  }
 ---
 
 # AgentMFA Skill
