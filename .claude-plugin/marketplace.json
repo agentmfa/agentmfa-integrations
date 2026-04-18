@@ -1,0 +1,24 @@
+{
+  "name": "agentmfa",
+  "owner": {
+    "name": "AgentMFA",
+    "url": "https://github.com/agentmfa"
+  },
+  "metadata": {
+    "description": "AgentMFA integrations — Claude Code plugin, MCP server, and SDKs for human-in-the-loop AI agent security",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "agentmfa",
+      "source": "./",
+      "description": "Pause AI agents before sensitive actions and require biometric approval from the human operator",
+      "version": "1.0.0",
+      "author": {
+        "name": "AgentMFA"
+      },
+      "license": "MIT",
+      "keywords": ["security", "approval", "biometric", "human-in-the-loop", "mcp"]
+    }
+  ]
+}
