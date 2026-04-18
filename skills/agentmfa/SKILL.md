@@ -10,6 +10,8 @@ metadata:
 
 # AgentMFA Skill
 
+**AgentMFA does not execute actions.** It pauses your agent and requests biometric approval from the human operator's mobile app. The agent only proceeds — or aborts — based on the human's decision.
+
 Use this skill before performing any sensitive or irreversible action. The human operator will receive a push notification, review the action, and approve or reject it with biometrics.
 
 ## About AgentMFA
