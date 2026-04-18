@@ -12,6 +12,16 @@ metadata:
 
 Use this skill before performing any sensitive or irreversible action. The human operator will receive a push notification, review the action, and approve or reject it with biometrics.
 
+## About AgentMFA
+
+- **Operator:** AgentMFA (https://agentmfa.ai)
+- **MCP server:** Local binary (`@agentmfa/mcp`) that runs on your machine and makes outbound HTTPS calls to `api.agentmfa.ai`
+- **Auth:** Requires `AGENTMFA_API_KEY` set in your shell environment — obtain from the AgentMFA dashboard after signing up
+- **Privacy & security policy:** https://agentmfa.ai/privacy
+- **Source code:** https://github.com/agentmfa/agentmfa-integrations
+
+The MCP server must be configured in your agent runtime before this skill can be used. See the setup instructions at https://github.com/agentmfa/agentmfa-integrations.
+
 ## When to Use
 
 - Deleting or modifying production data
@@ -23,7 +33,7 @@ Use this skill before performing any sensitive or irreversible action. The human
 
 ## How to Use
 
-This skill uses the AgentMFA MCP server tools. No HTTP calls or environment variables needed.
+This skill uses the AgentMFA MCP server tools. The MCP server handles all API communication — no direct HTTP calls needed in your agent code.
 
 ### Standard flow (blocking)
 
@@ -37,7 +47,7 @@ This skill uses the AgentMFA MCP server tools. No HTTP calls or environment vari
           or { status: "rejected" }
           or { status: "expired" }
 
-3a. status == "approved"  → proceed; log the code as proof
+3a. status == "approved"  → proceed; treat the code as a sensitive one-time token
 3b. status == "rejected"  → abort; inform the user
 3c. status == "expired"   → abort; treat as rejected
 ```
@@ -52,7 +62,7 @@ If you need to do other work while waiting, use `check_approval_status(request_i
 - **Abort on rejection** — do not retry the same action without user re-initiation
 - **Abort on expiry** — a timed-out request is treated as rejected
 - **Be specific** — `action` and `context` should give the human enough detail to decide
-- **Log the code** — the TOTP code returned on approval is proof; pass it to downstream systems if required
+- **Handle the code carefully** — the TOTP code returned on approval is a sensitive one-time token; do not write it to plain logs or external systems unless strictly necessary
 
 ## MCP Tools
 
