@@ -60,6 +60,7 @@ jobs:
 
   npm:
     needs: release
+    if: always() && needs.release.result != 'failure'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
