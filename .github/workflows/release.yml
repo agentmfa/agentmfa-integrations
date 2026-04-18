@@ -6,32 +6,7 @@ on:
       - '[0-9]*'
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    outputs:
-      mcp_changed: ${{ steps.check.outputs.mcp_changed }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check if mcp/ changed since last tag
-        id: check
-        run: |
-          PREV=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-          if [ -z "$PREV" ]; then
-            # First tag ever — always release
-            echo "mcp_changed=true" >> $GITHUB_OUTPUT
-          elif git diff --name-only "$PREV" HEAD -- mcp/ | grep -q .; then
-            echo "mcp_changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "mcp_changed=false" >> $GITHUB_OUTPUT
-            echo "No changes in mcp/ since $PREV — skipping release"
-          fi
-
   release:
-    needs: check
-    if: needs.check.outputs.mcp_changed == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -60,7 +35,6 @@ jobs:
 
   npm:
     needs: release
-    if: always() && needs.release.result != 'failure'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
