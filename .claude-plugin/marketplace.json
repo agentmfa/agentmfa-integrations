@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "AgentMFA integrations — Claude Code plugin, MCP server, and SDKs for human-in-the-loop AI agent security",
-    "version": "1.0.0"
+    "version": "1.0.4"
   },
   "plugins": [
     {
       "name": "agentmfa",
       "source": "./",
       "description": "Pause AI agents before sensitive actions and require biometric approval from the human operator",
-      "version": "1.0.0",
+      "version": "1.0.4",
       "author": {
         "name": "AgentMFA"
       },
