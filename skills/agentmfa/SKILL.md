@@ -77,7 +77,7 @@ If you need to do other work while waiting, use `check_approval_status(request_i
 - **Abort on rejection** — do not retry the same action without user re-initiation
 - **Abort on expiry** — a timed-out request is treated as rejected
 - **Be specific** — `action` and `context` should give the human enough detail to decide
-- **Handle the code carefully** — the one-time approval code returned on approval is sensitive; do not write it to plain logs or external systems unless strictly necessary
+- **Handle the code carefully** — the one-time approval code returned on approval is a sensitive one-time token; do not write it to logs or external systems
 
 ## MCP Tools
 
