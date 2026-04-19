@@ -41,7 +41,10 @@ For production use, pin the MCP server to a specific version rather than using `
 ```
 npx @agentmfa/mcp@1.0.0
 ```
-Review the package source at https://github.com/agentmfa/agentmfa-integrations/tree/main/mcp before installing.
+Review the package source at https://github.com/agentmfa/agentmfa-integrations/tree/main/mcp before installing. To verify the binary matches the published source, check the SHA256 hash against `checksums.txt` in the [GitHub release](https://github.com/agentmfa/agentmfa-integrations/releases):
+```
+sha256sum $(which agentmfa-mcp)
+```
 
 ## When to Use
 
