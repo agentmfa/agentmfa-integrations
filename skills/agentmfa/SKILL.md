@@ -4,34 +4,21 @@ description: Request human approval via biometric auth before performing sensiti
 homepage: https://agentmfa.ai
 license: MIT
 metadata:
-  {
-    "author": "agentmfa",
-    "version": "1.0.4",
-    "abstract": "AgentMFA pauses an agent before a sensitive action and requires the human operator to approve it on their phone using biometrics. Uses the AgentMFA MCP server — call request_approval, then wait_for_approval.",
-    "openclaw":
-      {
-        "emoji": "🔐",
-        "requires": { "bins": ["npx"] },
-        "install":
-          [
-            {
-              "id": "npm",
-              "kind": "node",
-              "package": "@agentmfa/mcp",
-              "bins": ["agentmfa-mcp"],
-              "label": "Install AgentMFA MCP server (npm)",
-            },
-          ],
-        "env":
-          [
-            {
-              "name": "AGENTMFA_API_KEY",
-              "description": "API key for the AgentMFA service — obtain from https://agentmfa.ai after signing up",
-              "required": true,
-            },
-          ],
-      },
-  }
+  openclaw:
+    emoji: "🔐"
+    requires:
+      env:
+        - AGENTMFA_API_KEY
+      bins:
+        - npx
+    primaryEnv: AGENTMFA_API_KEY
+    install:
+      - id: npm
+        kind: node
+        package: "@agentmfa/mcp"
+        bins:
+          - agentmfa-mcp
+        label: "Install AgentMFA MCP server (npm)"
 ---
 
 # AgentMFA Skill
