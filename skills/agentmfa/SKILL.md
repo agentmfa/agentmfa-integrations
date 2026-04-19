@@ -37,6 +37,12 @@ Use this skill before performing any sensitive or irreversible action. The human
 
 The MCP server must be configured in your agent runtime before this skill can be used. See the setup instructions at https://github.com/agentmfa/agentmfa-integrations.
 
+For production use, pin the MCP server to a specific version rather than using `latest`:
+```
+npx @agentmfa/mcp@1.0.0
+```
+Review the package source at https://github.com/agentmfa/agentmfa-integrations/tree/main/mcp before installing.
+
 ## When to Use
 
 - Deleting or modifying production data
