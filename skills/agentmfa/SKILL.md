@@ -1,6 +1,6 @@
 ---
 name: agentmfa
-description: Request human approval via biometric auth before performing sensitive actions. Use this skill whenever an action is irreversible, destructive, or requires human sign-off (e.g. deleting data, deploying to production, sending emails, making payments).
+description: AgentMFA skill — request human approval before sensitive actions, or manage agent registration. Subcommands: "register" (register this Claude instance), "list" (list registered agents), "status" (check login status). Without a subcommand, use the MCP tools to request approval.
 homepage: https://agentmfa.ai
 license: MIT
 metadata:
@@ -21,6 +21,24 @@ metadata:
 **AgentMFA does not execute actions.** It pauses your agent and requests biometric approval from the human operator's mobile app. The agent only proceeds — or aborts — based on the human's decision.
 
 Use this skill before performing any sensitive or irreversible action. The human operator will receive a push notification, review the action, and approve or reject it with biometrics.
+
+## Subcommands
+
+When invoked with a subcommand, handle it immediately using Bash — do not use MCP tools:
+
+| Invocation | Action |
+|---|---|
+| `/agentmfa register` | Run `agentmfa agent register` via Bash. Claude Code will be the parent process, so the agent is registered as `claude`. Wait for the user to approve on their phone. |
+| `/agentmfa register --update` | Run `agentmfa agent register --update` to re-register after a binary change. |
+| `/agentmfa list` | Run `agentmfa agent list` and display the results. |
+| `/agentmfa status` | Run `agentmfa auth status` to show login state. |
+
+Example — when user types `/agentmfa register`, execute:
+```bash
+agentmfa agent register
+```
+
+---
 
 ## About AgentMFA
 
