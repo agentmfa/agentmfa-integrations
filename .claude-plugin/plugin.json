@@ -1,6 +1,6 @@
 {
   "name": "agentmfa",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "description": "Human-in-the-loop biometric approval for AI agents. Pauses before sensitive actions and requires the human operator to approve via FaceID/fingerprint on their phone.",
   "author": {
     "name": "AgentMFA",
@@ -13,8 +13,8 @@
   "skills": "./skills/",
   "mcpServers": {
     "agentmfa": {
-      "command": "npx",
-      "args": ["-y", "@agentmfa/mcp"]
+      "command": "agentmfa",
+      "args": ["serve"]
     }
   }
 }
