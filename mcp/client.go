@@ -13,14 +13,14 @@ import (
 // Client calls the AgentMFA API.
 type Client struct {
 	baseURL    string
-	apiKey     string
+	authHeader string // full value for the Authorization header, e.g. "Bearer <jwt>" or "ApiKey <key>"
 	httpClient *http.Client
 }
 
-func NewClient(baseURL, apiKey string) *Client {
+func NewClient(baseURL, authHeader string) *Client {
 	return &Client{
-		baseURL: baseURL,
-		apiKey:  apiKey,
+		baseURL:    baseURL,
+		authHeader: authHeader,
 		httpClient: &http.Client{
 			Timeout: 30 * time.Second,
 		},
@@ -63,7 +63,7 @@ func (c *Client) RequestApproval(ctx context.Context, action string, details map
 		return nil, fmt.Errorf("create request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "ApiKey "+c.apiKey)
+	req.Header.Set("Authorization", c.authHeader)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -94,7 +94,7 @@ func (c *Client) CheckStatus(ctx context.Context, id string) (*ApprovalStatus, e
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
-	req.Header.Set("Authorization", "ApiKey "+c.apiKey)
+	req.Header.Set("Authorization", c.authHeader)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {

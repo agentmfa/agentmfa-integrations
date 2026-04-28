@@ -9,12 +9,14 @@ import (
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
+	"github.com/zalando/go-keyring"
 )
 
 func main() {
-	apiKey := os.Getenv("AGENTMFA_API_KEY")
-	if apiKey == "" {
-		fmt.Fprintln(os.Stderr, "warning: AGENTMFA_API_KEY not set — all tool calls will fail with 401")
+	authHeader, err := resolveAuth()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "fatal: %v\n", err)
+		os.Exit(1)
 	}
 
 	apiURL := os.Getenv("AGENTMFA_API_URL")
@@ -22,7 +24,7 @@ func main() {
 		apiURL = "https://api.agentmfa.ai"
 	}
 
-	client := NewClient(apiURL, apiKey)
+	client := NewClient(apiURL, authHeader)
 	s := server.NewMCPServer("agentmfa-mcp", "1.0.0")
 
 	// ── request_approval ─────────────────────────────────────────────────────
@@ -163,4 +165,26 @@ func main() {
 		fmt.Fprintf(os.Stderr, "fatal: %v\n", err)
 		os.Exit(1)
 	}
+}
+
+// resolveAuth returns the Authorization header value.
+// Priority: keychain session JWT (set by `agentmfa auth login`) > AGENTMFA_API_KEY env var.
+func resolveAuth() (string, error) {
+	// 1. Try keychain session.
+	raw, err := keyring.Get("agentmfa", "session")
+	if err == nil && raw != "" {
+		var session struct {
+			AccessToken string `json:"access_token"`
+		}
+		if json.Unmarshal([]byte(raw), &session) == nil && session.AccessToken != "" {
+			return "Bearer " + session.AccessToken, nil
+		}
+	}
+
+	// 2. Fall back to explicit API key.
+	if key := os.Getenv("AGENTMFA_API_KEY"); key != "" {
+		return "ApiKey " + key, nil
+	}
+
+	return "", fmt.Errorf("not authenticated — run `agentmfa auth login` or set AGENTMFA_API_KEY")
 }
