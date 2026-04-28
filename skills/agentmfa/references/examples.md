@@ -10,21 +10,27 @@ No HTTP calls, no environment variables — just tool calls.
 ```
 // Step 1 — request approval
 request_approval(
-  action: "Delete S3 bucket prod-data",
-  context: "Bucket contains 2.3GB of production backups from 2024",
-  risk_level: "high"
+  action: "delete_s3_bucket",
+  description: "Delete S3 bucket prod-data (2.3GB of production backups from 2024)"
 )
-// → { "id": "abc-123", "status": "pending", "expires_at": "..." }
+// → { request_id: "abc-123", message: "Approval request sent — waiting for human approval on the mobile app." }
+
+// ⚠️  Tell the user: "Request sent — waiting for your approval on the phone..."
 
 // Step 2 — wait for human decision
 wait_for_approval(request_id: "abc-123")
-// → { "status": "approved", "code": "483920" }
-//   or { "status": "rejected" }
+// → approved:
+//   {
+//     approved: true, totp_verified: true, token: "...",
+//     agent_totp: "483920", approved_by: "user@example.com",
+//     approved_from: "Samsung SM-A515F",
+//     message: "Request approved by user@example.com from Samsung SM-A515F via biometrics at 14:32:01 UTC with TOTP 483 920"
+//   }
+// → rejected: { approved: false, reason: "rejected by user" }
 
-// Step 3 — act on result
-if status == "approved"  → proceed with deletion, log code "483920" as proof
-if status == "rejected"  → abort, tell user the action was rejected
-if status == "expired"   → abort, tell user the request timed out
+// Step 3 — act on result and relay message
+if approved == true   → relay message to user, then proceed
+if approved == false  → abort, tell user the action was rejected
 ```
 
 ---

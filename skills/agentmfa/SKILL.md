@@ -82,14 +82,29 @@ This skill uses the AgentMFA MCP server tools (`agentmfa serve`). Your agent mak
 
 ```
 1. Call request_approval(action, description, context?)
-   → returns { request_id: "..." }
+   → returns { request_id: "...", message: "Approval request sent — waiting for human approval on the mobile app." }
+
+   ⚠️  Immediately relay the message to the user so they know to check their phone.
 
 2. Call wait_for_approval(request_id: <id from step 1>)
-   → blocks until human decides (polls every 3s, default 300s timeout)
-   → returns { approved: true,  totp_verified: true,  token: "..." }
-          or { approved: false, reason: "rejected by user" }
-          or { approved: false, reason: "approval request expired" }
-          or { approved: false, reason: "timed out waiting for approval" }
+   → blocks until human decides (polls every 1s, default 300s timeout)
+   → returns on approval:
+      {
+        approved: true,
+        totp_verified: true,
+        token: "...",
+        agent_totp: "123456",
+        server_time: 1234567890,
+        approved_by: "user@example.com",
+        approved_from: "Samsung SM-A515F",
+        message: "Request approved by user@example.com from Samsung SM-A515F via biometrics at 14:32:01 UTC with TOTP 123 456"
+      }
+   → returns on rejection:
+      { approved: false, reason: "rejected by user" }
+      { approved: false, reason: "approval request expired" }
+      { approved: false, reason: "timed out waiting for approval" }
+
+   ⚠️  On approval, relay the message field to the user verbatim.
 
 3a. approved == true   → proceed; the token is a short-lived one-time proof of approval
 3b. approved == false  → abort and inform the user
@@ -125,6 +140,6 @@ The approval response will include TOTP codes for each requested service.
 
 | Tool | Purpose |
 |---|---|
-| `request_approval(action, description, context?, services?)` | Submit approval request, returns `request_id` |
-| `wait_for_approval(request_id, timeout?)` | Block until decided, returns `approved` + `token` |
+| `request_approval(action, description, context?, services?)` | Submit approval request; returns `request_id` + `message` (relay to user) |
+| `wait_for_approval(request_id, timeout?)` | Block until decided (1s poll); returns `approved`, `token`, `agent_totp`, `approved_by`, `approved_from`, `message` |
 | `check_approval_status(request_id)` | Single non-blocking poll, returns `status` |
