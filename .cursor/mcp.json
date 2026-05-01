@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "agentmfa": {
+      "command": "agentmfa",
+      "args": ["serve"]
+    }
+  }
+}
