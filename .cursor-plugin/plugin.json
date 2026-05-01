@@ -9,7 +9,7 @@
   "homepage": "https://agentmfa.ai",
   "repository": "https://github.com/agentmfa/agentmfa-integrations",
   "license": "MIT",
-  "logo": "assets/logo.svg",
+  "logo": "images/agentmfa-logo-colored.png",
   "keywords": ["security", "approval", "biometric", "human-in-the-loop", "mcp"],
   "skills": "skills/",
   "rules": "rules/",
