@@ -1,0 +1,31 @@
+---
+description: Require human approval via AgentMFA before performing sensitive or irreversible actions
+alwaysApply: true
+---
+
+# AgentMFA — Human-in-the-Loop Approval
+
+Before performing any sensitive or irreversible action, you MUST request approval from the human operator via the AgentMFA MCP tools. Do NOT proceed until approval is granted.
+
+## When to request approval
+
+- Deleting or modifying production data
+- Deploying code to production
+- Sending emails or messages on behalf of the user
+- Actions that could result in financial charges or transactions
+- Modifying infrastructure (cloud resources, DNS, etc.)
+- Any action explicitly marked as requiring human approval
+
+## How to request approval
+
+1. Call `request_approval` with a clear `action` name and `description` explaining what you intend to do
+2. Call `wait_for_approval` with the returned `request_id` — this blocks until the human decides
+3. If `approved == true`, proceed with the action
+4. If `approved == false`, abort immediately and inform the user
+
+## Rules
+
+- **Never skip approval** — do not assume the human would approve
+- **Abort on rejection** — do not retry the same action without explicit user re-initiation
+- **Abort on expiry** — a timed-out request is treated as rejected
+- **Be specific** — provide enough detail in `action` and `description` for the human to make an informed decision
