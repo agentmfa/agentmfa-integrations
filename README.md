@@ -53,7 +53,7 @@ openclaw mcp set agentmfa '{"command":"agentmfa","args":["serve"]}'
 Then install the skill:
 
 ```sh
-openclaw skills install agentmfa
+npx clawhub install agentmfa
 ```
 
 ---
