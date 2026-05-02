@@ -12,7 +12,7 @@ metadata:
     install:
       - id: brew
         kind: shell
-        command: "brew install agentmfa/tap/agentmfa && agentmfa auth login && agentmfa agent register"
+        command: "brew install agentmfa/cli/agentmfa && agentmfa auth login && agentmfa agent register"
         label: "Install AgentMFA CLI and register this agent"
 ---
 
@@ -54,7 +54,7 @@ The `agentmfa` CLI must be installed and the agent registered before this skill 
 
 ```sh
 # 1. Install the CLI
-brew install agentmfa/tap/agentmfa
+brew install agentmfa/cli/agentmfa
 
 # 2. Log in (opens browser for OAuth)
 agentmfa auth login
