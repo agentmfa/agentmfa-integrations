@@ -10,18 +10,14 @@ AgentMFA adds a human approval step to your AI agent. Before it deletes files, d
 
 ## Install
 
+Create a free account at [agentmfa.ai](https://agentmfa.ai).
+
 ```sh
 brew install agentmfa/cli/agentmfa
 ```
 
-or
 
-```sh
-brew tap agentmfa/cli
-brew install agentmfa
-```
-
-Or download directly from [github.com/agentmfa/agentmfa/releases](https://github.com/agentmfa/agentmfa/releases).
+Or download directly from [GitHub releases](https://github.com/agentmfa/agentmfa-integrations/releases).
 
 Then log in:
 
