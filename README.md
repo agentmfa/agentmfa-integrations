@@ -44,7 +44,13 @@ That's it — Claude will now ask for your approval before taking any sensitive 
 
 ## Get started with OpenClaw
 
-Add the MCP server to `~/.openclaw/openclaw.json`:
+Add the MCP server:
+
+```sh
+openclaw mcp set agentmfa '{"command":"agentmfa","args":["serve"]}'
+```
+
+If your OpenClaw version doesn't support `mcp set`, add it manually to `~/.openclaw/openclaw.json`:
 
 ```json
 {
