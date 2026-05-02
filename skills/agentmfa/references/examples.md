@@ -1,36 +1,31 @@
 # AgentMFA MCP Examples
 
-These examples show how Claude should use the AgentMFA MCP tools.
-No HTTP calls, no environment variables — just tool calls.
+These examples show how an agent (Claude Code, Cursor, or any client running `agentmfa serve`) should use the AgentMFA MCP tools. No HTTP calls, no environment variables — just tool calls. Parameter names match the `agentmfa serve` stdio server.
 
 ---
 
 ## Basic approval before a destructive action
 
 ```
-// Step 1 — request approval
+// Step 1 — request approval (short label in action, detail in context)
 request_approval(
-  action: "delete_s3_bucket",
-  description: "Delete S3 bucket prod-data (2.3GB of production backups from 2024)"
+  action: "Delete S3 bucket prod-data",
+  context: "2.3GB of production backups from 2024; irreversible",
+  risk_level: "high"
 )
-// → { request_id: "abc-123", message: "Approval request sent — waiting for human approval on the mobile app." }
+// → JSON with id (use as request_id), e.g. { "id": "abc-123", "status": "pending", ... }
 
 // ⚠️  Tell the user: "Request sent — waiting for your approval on the phone..."
 
 // Step 2 — wait for human decision
 wait_for_approval(request_id: "abc-123")
-// → approved:
-//   {
-//     approved: true, totp_verified: true, token: "...",
-//     agent_totp: "483920", approved_by: "user@example.com",
-//     approved_from: "Samsung SM-A515F",
-//     message: "Request approved by user@example.com from Samsung SM-A515F via biometrics at 14:32:01 UTC with TOTP 483 920"
-//   }
-// → rejected: { approved: false, reason: "rejected by user" }
+// → JSON when status is no longer pending (fields depend on API), e.g.:
+//   { "status": "approved", "code": "..." }  or similar
+// → or timeout: { "status": "expired", "message": "..." }  — treat as rejected
 
-// Step 3 — act on result and relay message
-if approved == true   → relay message to user, then proceed
-if approved == false  → abort, tell user the action was rejected
+// Step 3 — act on result
+if approved / success  → relay any human-facing message, then proceed
+if rejected / expired  → abort, tell user the action was not approved
 ```
 
 ---
@@ -40,7 +35,7 @@ if approved == false  → abort, tell user the action was rejected
 ```
 wait_for_approval(
   request_id: "abc-123",
-  timeout_seconds: 120   // give operator 2 minutes instead of default 5
+  timeout_seconds: 120   // default is 300; server polls about every 3s
 )
 ```
 
@@ -50,15 +45,18 @@ wait_for_approval(
 
 ```
 // Request
-request_approval(action: "Send invoice emails", context: "247 recipients")
-// → id: "xyz-456"
+request_approval(
+  action: "Send invoice emails",
+  context: "247 recipients; batch job"
+)
+// → use "id" from the response as request_id
 
 // Do other preparation work here...
 
 // Check when ready
 check_approval_status(request_id: "xyz-456")
 // → { "status": "pending" }   ← still waiting
-// → { "status": "approved", "code": "..." }  ← done
+// → { "status": "approved", "code": "..." }  ← done (exact fields from API)
 ```
 
 ---

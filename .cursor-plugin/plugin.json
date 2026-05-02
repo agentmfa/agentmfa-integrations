@@ -4,7 +4,7 @@
   "description": "Human-in-the-loop biometric approval for AI agents. Pauses before sensitive actions and requires the human operator to approve via FaceID/fingerprint on their phone.",
   "author": {
     "name": "AgentMFA",
-    "email": "hello@agentmfa.ai"
+    "email": "leia@renee.cloud"
   },
   "homepage": "https://agentmfa.ai",
   "repository": "https://github.com/agentmfa/agentmfa-integrations",

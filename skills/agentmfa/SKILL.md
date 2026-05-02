@@ -1,6 +1,6 @@
 ---
 name: agentmfa
-description: AgentMFA skill — request human approval before sensitive actions, or manage agent registration. Subcommands: "register" (register this Claude instance), "list" (list registered agents), "status" (check login status). Without a subcommand, use the MCP tools to request approval.
+description: AgentMFA skill — request human approval before sensitive actions, or manage agent registration. Subcommands: "register" (register this agent), "list" (list registered agents), "status" (check login status). Without a subcommand, use the MCP tools to request approval. Works in Cursor, Claude Code, and any client that spawns the AgentMFA MCP server (`agentmfa serve`).
 homepage: https://agentmfa.ai
 license: MIT
 metadata:
@@ -28,12 +28,12 @@ When invoked with a subcommand, handle it immediately using Bash — do not use 
 
 | Invocation | Action |
 |---|---|
-| `/agentmfa register` | Run `agentmfa agent register` via Bash. Claude Code will be the parent process, so the agent is registered as `claude`. Wait for the user to approve on their phone. |
+| `/agentmfa register` | Run `agentmfa agent register` via Bash. The parent app names the agent (e.g. `claude` in **Claude Code**, `cursor` in **Cursor**). Wait for the user to approve on their phone. |
 | `/agentmfa register --update` | Run `agentmfa agent register --update` to re-register after a binary change. |
 | `/agentmfa list` | Run `agentmfa agent list` and display the results. |
 | `/agentmfa status` | Run `agentmfa auth status` to show login state. |
 
-Example — when user types `/agentmfa register`, execute:
+Example — when the user types `/agentmfa register`, execute:
 ```bash
 agentmfa agent register
 ```
@@ -43,8 +43,8 @@ agentmfa agent register
 ## About AgentMFA
 
 - **Operator:** AgentMFA (https://agentmfa.ai)
-- **MCP server:** `agentmfa serve` — part of the AgentMFA CLI; runs on your machine and communicates with `api.agentmfa.ai`
-- **Auth:** OAuth login via `agentmfa auth login` (credentials stored in system keychain — no env vars needed)
+- **MCP server:** `agentmfa serve` — part of the AgentMFA CLI; stdio MCP on your machine, talking to `api.agentmfa.ai`
+- **Auth:** OAuth via `agentmfa auth login` (session in the system keychain) or, if you use key-based devices, `AGENTMFA_API_KEY` as documented for your setup
 - **Privacy & security policy:** https://agentmfa.ai/privacy
 - **Source code:** https://github.com/agentmfa/agentmfa (fully open source)
 
@@ -63,7 +63,15 @@ agentmfa auth login
 agentmfa agent register
 ```
 
-After registration, `agentmfa serve` starts automatically when Claude invokes it via MCP. No environment variables needed.
+### Claude Code
+
+Use the AgentMFA plugin from this marketplace (or your usual install path). The plugin declares MCP with command `agentmfa`, args `serve` — so **`agentmfa serve` starts when the client connects**. No extra env vars for typical OAuth login.
+
+### Cursor
+
+Install/enable the AgentMFA **Cursor plugin** for this repo (or add MCP manually with the same command: `agentmfa` + arg `serve`). In **Cursor Settings → MCP**, confirm the AgentMFA server is listed and not erroring — that process **is** `agentmfa serve`. If `agent register` works in the terminal but MCP tools are missing, the CLI is fine; fix MCP/plugin startup in Cursor.
+
+After MCP is connected, `agentmfa serve` runs only while the client has a session — same as Claude Code.
 
 ## When to Use
 
@@ -76,70 +84,46 @@ After registration, `agentmfa serve` starts automatically when Claude invokes it
 
 ## How to Use
 
-This skill uses the AgentMFA MCP server tools (`agentmfa serve`). Your agent makes only tool calls — no direct HTTP calls.
+This skill uses the AgentMFA MCP tools exposed by **`agentmfa serve`**. Your agent uses **only MCP tool calls** — no direct HTTP.
+
+Tool parameter names must match the MCP schema your client shows (see table below). Put the **short label** in `action` and **full detail** in `context` so the operator sees enough to decide.
 
 ### Standard flow (blocking)
 
 ```
-1. Call request_approval(action, description, context?)
-   → returns { request_id: "...", message: "Approval request sent — waiting for human approval on the mobile app." }
+1. Call request_approval(action, context?, risk_level?)
+   → returns JSON including a request id (often `id`) — use that value as request_id in step 2.
 
-   ⚠️  Immediately relay the message to the user so they know to check their phone.
+   ⚠️  Relay any user-facing message from the tool result so they know to check their phone.
 
-2. Call wait_for_approval(request_id: <id from step 1>)
-   → blocks until human decides (polls every 1s, default 300s timeout)
-   → returns on approval:
-      {
-        approved: true,
-        totp_verified: true,
-        token: "...",
-        agent_totp: "123456",
-        server_time: 1234567890,
-        approved_by: "user@example.com",
-        approved_from: "Samsung SM-A515F",
-        message: "Request approved by user@example.com from Samsung SM-A515F via biometrics at 14:32:01 UTC with TOTP 123 456"
-      }
-   → returns on rejection:
-      { approved: false, reason: "rejected by user" }
-      { approved: false, reason: "approval request expired" }
-      { approved: false, reason: "timed out waiting for approval" }
+2. Call wait_for_approval(request_id: <id from step 1>, timeout_seconds?)
+   → blocks until decided (polls about every 3s; default timeout 300s)
+   → returns JSON when no longer pending (shape depends on API; treat non-success / timeout as rejected)
 
-   ⚠️  On approval, relay the message field to the user verbatim.
+   ⚠️  On approval, relay human-readable message fields to the user when present.
 
-3a. approved == true   → proceed; the token is a short-lived one-time proof of approval
-3b. approved == false  → abort and inform the user
+3a. Approved / success path   → proceed; any one-time token or code is a proof of approval — do not log unnecessarily
+3b. Rejected / expired / timeout  → abort and inform the user
 ```
 
 ### Non-blocking check
 
 Use `check_approval_status(request_id)` to poll once without blocking.
 
-### Requesting service credentials
-
-If the action requires a TOTP-protected service (e.g. AWS, GitHub), pass the `services` array:
-
-```
-request_approval(
-  action: "deploy_to_prod",
-  description: "Deploy v1.2.3 to production on AWS",
-  services: ["aws:prod:123456789012"]
-)
-```
-
-The approval response will include TOTP codes for each requested service.
-
 ## Rules
 
 - **Always wait** for approval before proceeding — never skip or assume approval
 - **Abort on rejection** — do not retry the same action without user re-initiation
 - **Abort on expiry** — a timed-out request is treated as rejected
-- **Be specific** — `action` and `description` should give the human enough detail to decide
-- **Handle the token carefully** — the one-time token returned on approval is a proof of authorization; do not log it
+- **Be specific** — `action` and `context` should give the human enough detail to decide
+- **Handle tokens carefully** — one-time proofs of approval should not be logged or pasted into chat
 
 ## MCP Tools
 
-| Tool | Purpose |
-|---|---|
-| `request_approval(action, description, context?, services?)` | Submit approval request; returns `request_id` + `message` (relay to user) |
-| `wait_for_approval(request_id, timeout?)` | Block until decided (1s poll); returns `approved`, `token`, `agent_totp`, `approved_by`, `approved_from`, `message` |
-| `check_approval_status(request_id)` | Single non-blocking poll, returns `status` |
+Your client may show slightly different optional fields — prefer the **tool schema** Cursor or Claude Code displays. Pass extra parameters only when listed there (e.g. some builds add service-scoped TOTP). Minimal shape for `agentmfa serve`:
+
+| Tool | Parameters | Purpose |
+|---|---|---|
+| `request_approval` | `action` (required), `context` (optional), `risk_level` (optional: `low` / `medium` / `high`) | Submit request; returns id for polling/wait |
+| `wait_for_approval` | `request_id` (required), `timeout_seconds` (optional, default 300) | Block until decided (~3s poll interval) |
+| `check_approval_status` | `request_id` (required) | Single non-blocking status poll |
