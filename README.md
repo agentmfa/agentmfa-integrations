@@ -13,7 +13,7 @@ AgentMFA adds a human approval step to your AI agent. Before it deletes files, d
 ### Step 1 — Install the CLI
 
 ```sh
-brew tap agentmfa/tap
+brew tap agentmfa/cli
 brew install agentmfa
 ```
 
