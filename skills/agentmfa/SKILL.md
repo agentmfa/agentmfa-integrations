@@ -29,7 +29,6 @@ When invoked with a subcommand, handle it immediately using Bash — do not use 
 | Invocation | Action |
 |---|---|
 | `/agentmfa register` | Run `agentmfa agent register` via Bash. The parent app names the agent (e.g. `claude` in **Claude Code**, `cursor` in **Cursor**). Wait for the user to approve on their phone. |
-| `/agentmfa register --update` | Run `agentmfa agent register --update` to re-register after a binary change. |
 | `/agentmfa list` | Run `agentmfa agent list` and display the results. |
 | `/agentmfa status` | Run `agentmfa auth status` to show login state. |
 
