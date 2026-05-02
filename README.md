@@ -44,10 +44,17 @@ That's it — Claude will now ask for your approval before taking any sensitive 
 
 ## Get started with OpenClaw
 
-Add the MCP server:
+Add the MCP server to `~/.openclaw/openclaw.json`:
 
-```sh
-openclaw mcp set agentmfa '{"command":"agentmfa","args":["serve"]}'
+```json
+{
+  "mcpServers": {
+    "agentmfa": {
+      "command": "agentmfa",
+      "args": ["serve"]
+    }
+  }
+}
 ```
 
 Then install the skill:
