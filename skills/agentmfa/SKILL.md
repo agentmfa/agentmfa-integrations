@@ -43,7 +43,7 @@ agentmfa agent register
 
 - **Operator:** AgentMFA (https://agentmfa.ai)
 - **MCP server:** `agentmfa serve` — part of the AgentMFA CLI; stdio MCP on your machine, talking to `api.agentmfa.ai`
-- **Auth:** OAuth via `agentmfa auth login` (session in the system keychain) or, if you use key-based devices, `AGENTMFA_API_KEY` as documented for your setup
+- **Auth:** OAuth via `agentmfa auth login` (session in the system keychain)
 - **Privacy & security policy:** https://agentmfa.ai/privacy
 - **Source code:** https://github.com/agentmfa/agentmfa (fully open source)
 
