@@ -13,7 +13,8 @@ AgentMFA adds a human approval step to your AI agent. Before it deletes files, d
 ### Step 1 — Install the CLI
 
 ```sh
-brew install agentmfa/tap/agentmfa
+brew tap agentmfa/agentmfa-integrations
+brew install agentmfa
 ```
 
 Or download directly from [github.com/agentmfa/agentmfa/releases](https://github.com/agentmfa/agentmfa/releases).
@@ -51,54 +52,11 @@ That's it — Claude will now ask for your approval before taking any sensitive 
 
 ## Get started with OpenClaw
 
-### Step 1 — Install the CLI and log in
-
-```sh
-brew install agentmfa/tap/agentmfa
-agentmfa auth login
-agentmfa agent register
-```
-
-### Step 2 — Add the MCP server
-
-Add this to your `~/.openclaw/openclaw.json`:
-
-```json
-{
-  "mcp": {
-    "servers": {
-      "agentmfa": {
-        "command": "agentmfa",
-        "args": ["serve"]
-      }
-    }
-  }
-}
-```
-
-### Step 3 — Install the skill
-
-**Via ClawHub** (recommended):
+Follow steps 1–4 above to install the CLI, log in, register your agent, and install the mobile app. Then install the skill (this also configures the MCP server):
 
 ```sh
 openclaw skills install agentmfa
 ```
-
-**Via curl** — global, available to all your OpenClaw agents:
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/agentmfa/agentmfa-integrations/main/install-skill.sh | sh
-```
-
-**Via curl** — per workspace, available only in a specific project:
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/agentmfa/agentmfa-integrations/main/install-skill.sh | sh -s -- /path/to/your/workspace/skills
-```
-
-### Step 4 — Install the mobile app
-
-Download the AgentMFA app on your phone and sign in with the same account.
 
 ---
 
