@@ -1,0 +1,14 @@
+{
+  "id": "agentmfa-plugin",
+  "name": "AgentMFA Plugin",
+  "description": "Requires biometric approval on your phone before OpenClaw can run sensitive commands like deleting files, deploying code, or sending messages",
+  "version": "1.0.0",
+  "entry": "dist/index.js",
+  "engines": {
+    "openclaw": ">=2026.4.0"
+  },
+  "configSchema": {},
+  "permissions": [
+    "gateway:config:read"
+  ]
+}
