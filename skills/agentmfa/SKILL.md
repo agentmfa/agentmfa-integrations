@@ -1,6 +1,6 @@
 ---
 name: agentmfa
-description: AgentMFA skill — request human approval before sensitive actions, or manage agent registration. Subcommands: "register" (register this agent), "list" (list registered agents), "status" (check login status). Without a subcommand, use the MCP tools to request approval. Works in Cursor, Claude Code, and any client that spawns the AgentMFA MCP server (`agentmfa serve`).
+description: AgentMFA — request human approval before sensitive actions. Uses MCP tools for registration, identity, and approval flows. Works in Claude Code, Cursor, OpenClaw, and any MCP-compatible client.
 homepage: https://agentmfa.ai
 license: MIT
 metadata:
@@ -12,30 +12,24 @@ metadata:
     install:
       - id: brew
         kind: shell
-        command: "brew install agentmfa/cli/agentmfa && agentmfa auth login && agentmfa agent register"
-        label: "Install AgentMFA CLI and register this agent"
+        command: "brew install agentmfa/cli/agentmfa && agentmfa auth login"
+        label: "Install AgentMFA CLI and log in"
 ---
 
 # AgentMFA Skill
 
-**AgentMFA does not execute actions.** It pauses your agent and requests biometric approval from the human operator's mobile app. The agent only proceeds — or aborts — based on the human's decision.
+**AgentMFA is an opt-in approval system.** The agent must explicitly call these tools before sensitive actions. AgentMFA does not automatically intercept or block anything — the agent decides when to request approval.
 
-Use this skill before performing any sensitive or irreversible action. The human operator will receive a push notification, review the action, and approve or reject it with biometrics.
+When the agent calls `request_approval`, the human operator receives a push notification, reviews the action, and approves or rejects it with biometrics. The agent then decides whether to proceed based on the response.
 
 ## Subcommands
 
-When invoked with a subcommand, handle it immediately using Bash — do not use MCP tools:
+These are CLI-only operations, run via Bash:
 
 | Invocation | Action |
 |---|---|
-| `/agentmfa register` | Run `agentmfa agent register` via Bash. The parent app names the agent (e.g. `claude` in **Claude Code**, `cursor` in **Cursor**). Wait for the user to approve on their phone. |
 | `/agentmfa list` | Run `agentmfa agent list` and display the results. |
 | `/agentmfa status` | Run `agentmfa auth status` to show login state. |
-
-Example — when the user types `/agentmfa register`, execute:
-```bash
-agentmfa agent register
-```
 
 ---
 
@@ -47,7 +41,7 @@ agentmfa agent register
 - **Privacy & security policy:** https://agentmfa.ai/privacy
 - **Source code:** https://github.com/agentmfa/agentmfa (fully open source)
 
-The `agentmfa` CLI must be installed and the agent registered before this skill can be used. See setup below.
+The `agentmfa` CLI must be installed and logged in before this skill can be used.
 
 ## Setup
 
@@ -57,29 +51,33 @@ brew install agentmfa/cli/agentmfa
 
 # 2. Log in (opens browser for OAuth)
 agentmfa auth login
-
-# 3. Register this agent (requires approval on your phone)
-agentmfa agent register
 ```
 
-### Claude Code
-
-Use the AgentMFA plugin from this marketplace (or your usual install path). The plugin declares MCP with command `agentmfa`, args `serve` — so **`agentmfa serve` starts when the client connects**. No extra env vars for typical OAuth login.
-
-### Cursor
-
-Install/enable the AgentMFA **Cursor plugin** for this repo (or add MCP manually with the same command: `agentmfa` + arg `serve`). In **Cursor Settings → MCP**, confirm the AgentMFA server is listed and not erroring — that process **is** `agentmfa serve`. If `agent register` works in the terminal but MCP tools are missing, the CLI is fine; fix MCP/plugin startup in Cursor.
-
-After MCP is connected, `agentmfa serve` runs only while the client has a session — same as Claude Code.
+Registration happens automatically via the `register_agent` MCP tool — no manual step needed.
 
 ## When to Use
 
+The agent should call AgentMFA tools before:
 - Deleting or modifying production data
 - Deploying code to production
 - Sending emails or messages on behalf of the user
 - Actions that could result in financial charges or transactions
 - Modifying infrastructure (cloud resources, DNS, etc.)
-- Any action explicitly marked as requiring human approval
+- Any action the agent recognizes as sensitive or irreversible
+
+**Common risky actions requiring approval:**
+- `git push --force` or rewriting history
+- `kubectl delete` on production resources
+- `kubectl apply/edit` to running workloads
+- `terraform apply` (especially with deletions shown in plan)
+- `terraform destroy` on any environment
+- `rm -rf` or bulk file deletions
+- Database schema changes or deletions
+- Modifying secrets (SOPS encrypt/decrypt)
+- Force pushing branches (`git push -f`)
+- Checking out or switching branches in production repos
+
+**Note:** AgentMFA does not automatically detect sensitive actions. The agent must recognize the risk and explicitly invoke the approval flow.
 
 ## How to Use
 
@@ -87,23 +85,33 @@ This skill uses the AgentMFA MCP tools exposed by **`agentmfa serve`**. Your age
 
 Tool parameter names must match the MCP schema your client shows (see table below). Put the **short label** in `action` and **full detail** in `context` so the operator sees enough to decide.
 
-### Standard flow (blocking)
+### Standard flow
 
 ```
-1. Call request_approval(action, context?, risk_level?)
-   → returns JSON including a request id (often `id`) — use that value as request_id in step 2.
+1. Call register_agent()
+   → Checks if already registered — returns immediately if so
+   → If not registered, registers and waits for approval (auto or mobile)
+   → Returns: { status, tool, remote, message }
+   ⚠️ Relay the message to the user
 
-   ⚠️  Relay any user-facing message from the tool result so they know to check their phone.
+2. Call request_approval(action, description, context?)
+   → Returns: { request_id, message }
+   ⚠️ Relay the message so the user knows to check their phone
 
-2. Call wait_for_approval(request_id: <id from step 1>, timeout_seconds?)
-   → blocks until decided (polls about every 3s; default timeout 300s)
-   → returns JSON when no longer pending (shape depends on API; treat non-success / timeout as rejected)
+3. Call wait_for_approval(request_id)
+   → Blocks until decided (polls every 1s, default 300s timeout)
+   → Approved: { approved: true, totp_verified, token, agent_totp,
+                  server_time, approved_by, approved_from, message }
+   → Rejected: { approved: false, reason }
+   ⚠️ On approval, relay the message field verbatim
 
-   ⚠️  On approval, relay human-readable message fields to the user when present.
-
-3a. Approved / success path   → proceed; any one-time token or code is a proof of approval — do not log unnecessarily
-3b. Rejected / expired / timeout  → abort and inform the user
+4a. approved == true  → proceed
+4b. approved == false → abort and inform the user
 ```
+
+### Identity check
+
+Call `agent_info()` to see the locally detected identity — tool name, repository, branch, machine, code signature, verification mode, and registration status. Useful for debugging.
 
 ### Non-blocking check
 
@@ -111,6 +119,7 @@ Use `check_approval_status(request_id)` to poll once without blocking.
 
 ## Rules
 
+- **The agent decides when to call AgentMFA** — nothing forces automatic approval checks
 - **Always wait** for approval before proceeding — never skip or assume approval
 - **Abort on rejection** — do not retry the same action without user re-initiation
 - **Abort on expiry** — a timed-out request is treated as rejected
@@ -119,10 +128,19 @@ Use `check_approval_status(request_id)` to poll once without blocking.
 
 ## MCP Tools
 
-Your client may show slightly different optional fields — prefer the **tool schema** Cursor or Claude Code displays. Pass extra parameters only when listed there (e.g. some builds add service-scoped TOTP). Minimal shape for `agentmfa serve`:
-
 | Tool | Parameters | Purpose |
 |---|---|---|
-| `request_approval` | `action` (required), `context` (optional), `risk_level` (optional: `low` / `medium` / `high`) | Submit request; returns id for polling/wait |
-| `wait_for_approval` | `request_id` (required), `timeout_seconds` (optional, default 300) | Block until decided (~3s poll interval) |
-| `check_approval_status` | `request_id` (required) | Single non-blocking status poll |
+| `agent_info` | _(none)_ | Local identity data — tool, repo, branch, machine, signature, registration status |
+| `register_agent` | `role` (optional), `force` (optional boolean) | Register this agent. Checks first, blocks until decided |
+| `request_approval` | `action` (required), `description` (required), `context` (optional), `services` (optional array) | Submit approval request; returns `request_id` + `message` |
+| `wait_for_approval` | `request_id` (required), `timeout` (optional, default 300s) | Block until decided |
+| `check_approval_status` | `request_id` (required) | Single non-blocking poll |
+
+### OpenClaw Users
+
+In OpenClaw, MCP tools are namespaced with the server name prefix. Use these exact tool names:
+- `agentmfa__agent_info`
+- `agentmfa__register_agent`
+- `agentmfa__request_approval`
+- `agentmfa__wait_for_approval`
+- `agentmfa__check_approval_status`
